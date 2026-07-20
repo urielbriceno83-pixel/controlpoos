@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>CONTROLPOOS</title>
+    <style>
+        /* [MANTÉN AQUÍ TUS ESTILOS DEL FONDO ANIMADO Y CSS PROFESIONAL] */
+        :root { --primary: #27ae60; --dark: #2c3e50; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: white; min-height: 100vh; }
+        .nav { display: flex; justify-content: space-between; padding: 20px; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: rgba(255,255,255,0.9); color: #333; padding: 15px; border-radius: 15px; transition: transform 0.3s; text-align: center; }
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+    
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-contenido { background: white; color: #333; margin: 15% auto; padding: 20px; width: 300px; border-radius: 10px; position: relative; }
+        .cerrar { float: right; cursor: pointer; font-size: 20px; }
+        
+    </style>
+</head>
+<body>
+
+<div id="pantalla-login" class="login-container" style="min-height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #1e3c72, #2a5298); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div style="background: rgba(255, 255, 255, 0.98); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center;">
+        <img src="../img/ControlPOOS.jpeg" alt="Logo ControlPOOS" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #1e3c72; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <h1 style="color: #1e3c72; font-size: 1.8rem; margin-bottom: 5px; font-weight: 700;">CONTROLPOOS</h1>
+        <p style="color: #666; font-size: 0.95rem; margin-bottom: 25px;">Sistema Profesional de Inventario</p>
+        
+        <div style="text-align: left; margin-bottom: 15px;">
+            <label style="font-size: 0.85rem; color: #444; font-weight: bold; display: block; margin-bottom: 5px;">Correo Electrónico</label>
+            <input type="email" id="user" placeholder="usuario@correo.com" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 0.95rem; outline: none;">
+        </div>
+        
+        <div style="text-align: left; margin-bottom: 25px;">
+            <label style="font-size: 0.85rem; color: #444; font-weight: bold; display: block; margin-bottom: 5px;">Contraseña</label>
+            <input type="password" id="pass" placeholder="••••••••" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 0.95rem; outline: none;">
+        </div>
+        
+        <button class="btn" onclick="validarLogin()" style="width: 100%; padding: 12px; background: #1e3c72; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background 0.3s; box-shadow: 0 4px 10px rgba(30,60,114,0.3);">Ingresar al Sistema</button>
+    </div>
+</div>
+
+<div id="pantalla-principal" style="display: none; min-height: 100vh; background: #f4f7f6; display: flex; flex-direction: column; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <!-- Encabezado Superior -->
+    <nav style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #1e3c72; color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="../img/ControlPOOS.jpeg" alt="Logo ControlPOOS" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white;">
+            <h2 style="margin: 0; font-size: 1.4rem; letter-spacing: 0.5px;">CONTROLPOOS</h2>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="btn" onclick="abrirModal('modal-perfil')" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">👤 Mi Perfil</button>
+            <div onclick="abrirModal('modal-carrito')" style="cursor: pointer; position: relative; font-size: 1.3rem; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); padding: 8px 12px; border-radius: 8px;" title="Ver Carrito">🛒</div>
+        </div>
+    </nav>
+
+    <!-- Layout Principal: Sidebar Izquierdo + Contenido -->
+    <div style="display: flex; flex: 1; flex-direction: row; padding: 25px; gap: 25px; box-sizing: border-box;">
+        
+        <!-- Sidebar de Categorías (Izquierda) -->
+        <aside style="width: 260px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: fit-content;">
+            <h3 style="margin-top: 0; color: #1e3c72; font-size: 1.1rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px;">Categorías</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                <button onclick="filtrarCat('Todos')" style="text-align: left; padding: 12px 15px; background: #f0f4f8; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #1e3c72; transition: 0.2s;">✨ Todos los productos</button>
+                <button onclick="filtrarCat('Frutas')" style="text-align: left; padding: 12px 15px; background: transparent; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: #555; transition: 0.2s;">🍎 Frutas</button>
+                <button onclick="filtrarCat('Verduras')" style="text-align: left; padding: 12px 15px; background: transparent; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: #555; transition: 0.2s;">🥦 Verduras</button>
+                <button onclick="filtrarCat('Abarrotes')" style="text-align: left; padding: 12px 15px; background: transparent; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: #555; transition: 0.2s;">🥫 Abarrotes</button>
+            </div>
+        </aside>
+
+        <!-- Área Central (Buscador + Grid de Productos) -->
+        <main style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+            <!-- Barra de Búsqueda -->
+            <div style="background: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 1.2rem;">🔍</span>
+                <input type="text" id="buscador" placeholder="Buscar producto en el inventario por nombre..." onkeyup="buscarProductos(this.value)" style="width: 100%; border: none; outline: none; font-size: 1rem; color: #333; background: transparent;">
+            </div>
+
+            <!-- Contenedor Dinámico de Productos -->
+            <div id="contenedor-productos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;"></div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal Carrito Mejorado -->
+<div id="modal-carrito" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 1000;">
+    <div style="background: white; width: 100%; max-width: 480px; border-radius: 16px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); overflow: hidden; display: flex; flex-direction: column;">
+        
+        <!-- Cabecera del Carrito -->
+        <div style="background: #1e3c72; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; font-size: 1.25rem;">🛒 Resumen de Compra</h2>
+            <span onclick="cerrarModal('modal-carrito')" style="cursor: pointer; font-size: 1.5rem; font-weight: bold; line-height: 1;">&times;</span>
+        </div>
+        
+        <!-- Lista de Items -->
+        <div id="lista-carrito-items" style="padding: 20px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
+            <p style="color: #777; text-align: center; margin: 30px 0;">Tu carrito está vacío</p>
+        </div>
+
+        <!-- Footer del Carrito con Totales y Botones -->
+        <div style="background: #f8fafc; padding: 20px; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; color: #1e3c72;">
+                <span>Total General:</span>
+                <span id="carrito-total">$0.00</span>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button onclick="cerrarModal('modal-carrito')" style="flex: 1; padding: 12px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #475569; transition: background 0.2s;">Seguir Comprando</button>
+                <button onclick="finalizarCompra()" style="flex: 1; padding: 12px; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 10px rgba(34,197,94,0.3);">Confirmar Venta</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <nav style="padding: 15px; display: flex; gap: 10px; justify-content: center;">
+        <button class="btn" onclick="filtrarCat('Frutas')">🍎 Frutas</button>
+        <button class="btn" onclick="filtrarCat('Verduras')">🥦 Verduras</button>
+        <button class="btn" onclick="filtrarCat('Abarrotes')">🥫 Abarrotes</button>
+        <button class="btn" onclick="filtrarCat('Todos')">✨ Todos</button>
+    </nav>
+
+    <!-- Grid de Productos -->
+    <div id="contenedor-productos" class="grid"></div>
+</div>
+
+<script>
+
+    let listaOriginal = []; 
+
+    async function cargarProductosDesdeAPI() {
+        const res = await fetch('http://localhost:3000/api/productos');
+        listaOriginal = await res.json(); // Aquí le asignas el valor
+        renderizar(listaOriginal);
+    }
+
+    function filtrarCat(cat) {
+        // Ahora sí podrá leer el valor de listaOriginal
+        if (cat === 'Todos') return renderizar(listaOriginal);
+        const filtrados = listaOriginal.filter(p => p.categoria === cat);
+        renderizar(filtrados);
+    }
+
+// Función para buscar productos interactivamente
+function buscarProductos(texto) {
+    const query = texto.toLowerCase();
+    const filtrados = listaOriginal.filter(p => p.nombre.toLowerCase().includes(query));
+    renderizar(filtrados);
+}
+
+// Funciones globales de control de modales
+function abrirModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'flex';
+}
+
+function cerrarModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'none';
+}
+
+    function validarLogin() {
+    console.log("Intentando ingresar..."); 
+    const email = document.getElementById('user').value;
+    
+    if (email && email.includes('@')) {
+        document.getElementById('pantalla-login').style.display = 'none';
+        document.getElementById('pantalla-principal').style.display = 'block';
+        console.log("Cambio de pantalla exitoso");
+    } else {
+        alert("Revisa tu correo");
+    }
+}
+
+function renderizar(lista) {
+    const contenedor = document.getElementById('contenedor-productos');
+    contenedor.innerHTML = lista.map(p => `
+        <div class="card" style="box-shadow: 0 4px 8px rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; background: white; text-align: center;">
+            <img src="../img/${obtenerRutaImagen(p.nombre)}" alt="${p.nombre}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin-bottom: 10px;">
+            <h3 style="margin: 5px 0;">${p.nombre}</h3>
+            <p style="color: #666; font-size: 0.9em;">Stock: ${p.stock}</p>
+            <p style="font-size: 1.2em; font-weight: bold; color: var(--primary);">$${p.precio.toFixed(2)}</p>
+            <button class="btn" style="width: 100%;" onclick="agregarAlCarrito('${p.nombre}', ${p.precio})">Agregar</button>
+        </div>
+    `).join('');
+}
+
+function obtenerRutaImagen(nombre) {
+    const n = nombre.toLowerCase();
+    if (n.includes('manzana')) return 'manzanaRoja.jpg';
+    if (n.includes('plátano') || n.includes('platano')) return 'platano.jpg';
+    if (n.includes('uvas')) return 'uvasVerdes.jpg';
+    if (n.includes('zanahoria')) return 'zanahoria.jpg';
+    if (n.includes('lechuga')) return 'lechugaRomana.jpg';
+    if (n.includes('leche')) return 'Lecheentera.jpg';
+    return 'ControlPOOS.jpeg'; // Imagen por defecto si no coincide ninguna
+}
+
+// Función auxiliar para iconos (puedes expandirla)
+function obtenerIcono(nombre) {
+    if (nombre.toLowerCase().includes('manzana')) return '🍎';
+    if (nombre.toLowerCase().includes('leche')) return '🥛';
+    if (nombre.toLowerCase().includes('arroz')) return '🍚';
+    return '📦'; // Ícono por defecto
+}
+    </script>
+            <!-- Ventanas emergentes (Modales) -->
+        <div id="modal-perfil" class="modal">
+        <div class="modal-contenido">
+        <span onclick="cerrarModal('modal-perfil')" class="cerrar">&times;</span>
+        <h2>Perfil de Usuario</h2>
+        <p><strong>Correo:</strong> <span id="perfil-email"></span></p>
+    </div>
+    </div>
+
+    <div id="modal-carrito" class="modal">
+    <div class="modal-contenido">
+        <span onclick="cerrarModal('modal-carrito')" class="cerrar">&times;</span>
+        <h2>🛒 Tu Carrito</h2>
+        <div id="lista-carrito"></div>
+        <p><strong>Total: <span id="total-carrito">$0.00</span></strong></p>
+    </div>
+
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBuuLUuRVtgLEAIp2dtwnATaT9cTpPzHzg",
+    authDomain: "controlpoos.firebaseapp.com",
+    projectId: "controlpoos",
+    storageBucket: "controlpoos.firebasestorage.app",
+    messagingSenderId: "783119856831",
+    appId: "1:783119856831:web:a5f34e9a149f09705f020a",
+    measurementId: "G-KWLLV360BK"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
+
+    // Guardamos la base de datos en una variable global para usarla en el resto de tu JS
+    window.db = db;
+
+    console.log("¡Firebase conectado correctamente!");
+
+</script>
+
+</body>
+</html>

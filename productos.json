@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "nombre": "Manzana Roja",
+    "precio": 25.0,
+    "stock": 20,
+    "categoria": "Frutas"
+  },
+  {
+    "id": 2,
+    "nombre": "Plátano",
+    "precio": 15.0,
+    "stock": 30,
+    "categoria": "Frutas"
+  },
+  {
+    "id": 3,
+    "nombre": "Zanahoria",
+    "precio": 10.0,
+    "stock": 15,
+    "categoria": "Verduras"
+  },
+  {
+    "id": 4,
+    "nombre": "Lechuga Romana",
+    "precio": 12.0,
+    "stock": 8,
+    "categoria": "Verduras"
+  },
+  {
+    "id": 5,
+    "nombre": "Uvas Verdes",
+    "precio": 45.0,
+    "stock": 12,
+    "categoria": "Frutas"
+  },
+  {
+    "id": 6,
+    "nombre": "Leche Entera",
+    "precio": 22.5,
+    "stock": 10,
+    "categoria": "Abarrotes"
+  }
+]
