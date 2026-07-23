@@ -1,254 +1,801 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>CONTROLPOOS</title>
-    <style>
-        /* [MANTÉN AQUÍ TUS ESTILOS DEL FONDO ANIMADO Y CSS PROFESIONAL] */
-        :root { --primary: #27ae60; --dark: #2c3e50; }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: white; min-height: 100vh; }
-        .nav { display: flex; justify-content: space-between; padding: 20px; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: rgba(255,255,255,0.9); color: #333; padding: 15px; border-radius: 15px; transition: transform 0.3s; text-align: center; }
-        .btn { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ControlPOOS - Punto de Venta</title>
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { background: linear-gradient(135deg, #1cb5e0 0%, #000851 100%); height: 100vh; overflow: hidden; display: flex; }
+
+    #pantalla-login { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #1cb5e0 0%, #000851 100%); display: flex; justify-content: center; align-items: center; z-index: 9999; overflow-y: auto; padding: 20px; }
+    .login-card { background: white; padding: 30px 25px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin: auto; }
+    .login-logo { width: 80px; height: 80px; border-radius: 50%; border: 2px solid #000851; object-fit: cover; margin-bottom: 10px; }
+    .login-title { color: #000851; font-size: 22px; font-weight: 900; margin-bottom: 5px; }
+    .login-subtitle { color: #666; font-size: 12px; margin-bottom: 20px; }
+    .input-group { text-align: left; margin-bottom: 12px; }
+    .input-group label { display: block; font-size: 12px; color: #333; margin-bottom: 4px; font-weight: bold; }
+    .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; background: white; transition: 0.3s; }
+    .input-group input:focus, .input-group select:focus { border-color: #000851; box-shadow: 0 0 5px rgba(0, 8, 81, 0.2); }
+    .btn-ingresar { width: 100%; background: #000851; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+    .btn-ingresar:hover { background: #1cb5e0; }
+
+    #app-dashboard { display: none; width: 100%; height: 100%; position: relative; }
+
+    .sidebar { width: 260px; background-color: #f8f9fa; padding: 20px; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 20; transition: left 0.3s ease; overflow-y: auto; }
+    .btn-cerrar { color: #d32f2f; background: white; border: 1px solid #ffcdd2; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; text-align: left; margin-bottom: 20px; transition: 0.2s; }
+    .btn-cerrar:hover { background: #ffebee; }
+    .logo-container { text-align: center; margin-bottom: 20px; }
+    .logo-container img { width: 70px; height: 70px; border-radius: 50%; border: 2px solid #000851; object-fit: cover; }
+    .logo-container h2 { font-size: 16px; color: #000851; margin-top: 8px; font-weight: 800; }
+    .badge-perfil { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-top: 5px; }
+    .badge-cliente { background: #e3f2fd; color: #1565c0; }
+    .badge-empresa { background: #e8f5e9; color: #2e7d32; }
+
+    .btn-categoria { background: white; border: 1px solid #e0e0e0; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; text-align: left; font-size: 15px; color: #333; transition: all 0.3s ease; }
+    .btn-categoria:hover { background: #e3f2fd; border-color: #2196f3; color: #1976d2; transform: translateX(5px); }
+
+    .main-content { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 10px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); gap: 15px; }
     
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-contenido { background: white; color: #333; margin: 15% auto; padding: 20px; width: 300px; border-radius: 10px; position: relative; }
-        .cerrar { float: right; cursor: pointer; font-size: 20px; }
-        
-    </style>
+    .btn-menu-movil { display: none; background: #000851; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 18px; cursor: pointer; }
+    .buscador { flex: 1; padding: 12px 20px; border-radius: 25px; border: 1px solid #ccc; font-size: 15px; outline: none; }
+    
+    .acciones-usuario { display: flex; gap: 10px; align-items: center; }
+    .btn-perfil { background: #1976d2; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-perfil:hover { background: #1565c0; }
+    .btn-carrito { background: #4caf50; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    
+    .grid-productos { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+    .card { background: white; border-radius: 12px; padding: 15px; width: 200px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; transition: 0.3s; }
+    .card:hover { transform: translateY(-5px); }
+    .card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+    .card h4 { font-size: 15px; color: #333; margin-bottom: 5px; text-align: center; height: 38px; }
+    .card .precio { color: #2e7d32; font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+    .card .stock { font-size: 12px; color: #757575; margin-bottom: 10px; }
+    .btn-agregar { background: #1976d2; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
+
+    .carrito-panel { position: fixed; top: 0; right: -100%; width: 360px; height: 100vh; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: right 0.3s ease; padding: 20px; display: flex; flex-direction: column; z-index: 100; }
+    .carrito-panel.activo { right: 0; }
+    
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 200; display: none; justify-content: center; align-items: center; padding: 20px; }
+    .modal-content { background: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 380px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .btn-cerrar-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; color: #d32f2f; cursor: pointer; }
+    
+    .foto-perfil-preview { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #000851; margin-bottom: 15px; }
+    .etiqueta-correo { background: #f0f4f8; color: #000851; padding: 8px 15px; border-radius: 20px; font-size: 14px; font-weight: bold; display: inline-block; margin-bottom: 20px; }
+    .btn-subir-foto { background: #1976d2; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 14px; display: inline-block; font-weight: bold; }
+    .btn-subir-foto:hover { background: #1565c0; }
+    input[type="file"] { display: none; }
+
+    .social-container { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+    .btn-social { padding: 12px; border-radius: 8px; text-decoration: none; color: white; font-weight: bold; font-size: 15px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .btn-social:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
+    .facebook { background: #1877F2; }
+    .instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .whatsapp { background: #25D366; }
+
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; left: -100%; height: 100vh; } 
+      .sidebar.activo { left: 0; } 
+      .btn-menu-movil { display: block; } 
+      .top-bar { flex-wrap: wrap; }
+      .buscador { order: 3; min-width: 100%; margin-top: 10px; }
+      .acciones-usuario { flex: 1; justify-content: flex-end; }
+      .carrito-panel { width: 100%; } 
+      .card { width: 100%; max-width: 250px; }
+    }
+  </style>
 </head>
 <body>
 
-<div id="pantalla-login" class="login-container" style="min-height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #1e3c72, #2a5298); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <div style="background: rgba(255, 255, 255, 0.98); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center;">
-        <img src="../img/ControlPOOS.jpeg" alt="Logo ControlPOOS" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #1e3c72; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-        <h1 style="color: #1e3c72; font-size: 1.8rem; margin-bottom: 5px; font-weight: 700;">CONTROLPOOS</h1>
-        <p style="color: #666; font-size: 0.95rem; margin-bottom: 25px;">Sistema Profesional de Inventario</p>
-        
-        <div style="text-align: left; margin-bottom: 15px;">
-            <label style="font-size: 0.85rem; color: #444; font-weight: bold; display: block; margin-bottom: 5px;">Correo Electrónico</label>
-            <input type="email" id="user" placeholder="usuario@correo.com" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 0.95rem; outline: none;">
-        </div>
-        
-        <div style="text-align: left; margin-bottom: 25px;">
-            <label style="font-size: 0.85rem; color: #444; font-weight: bold; display: block; margin-bottom: 5px;">Contraseña</label>
-            <input type="password" id="pass" placeholder="••••••••" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 0.95rem; outline: none;">
-        </div>
-        
-        <button class="btn" onclick="validarLogin()" style="width: 100%; padding: 12px; background: #1e3c72; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background 0.3s; box-shadow: 0 4px 10px rgba(30,60,114,0.3);">Ingresar al Sistema</button>
+  <div id="pantalla-login">
+    <div class="login-card">
+      <img src="./img/ControlPOOS.jpeg" alt="Logo" class="login-logo">
+      <h1 class="login-title">CONTROLPOOS</h1>
+      <p class="login-subtitle">Sistema Profesional de Inventario</p>
+      
+      <div class="input-group">
+        <label>Tipo de Perfil</label>
+        <select id="select-perfil">
+          <option value="Cliente">👤 Cliente (Tienda Regular)</option>
+          <option value="Empresa">🏢 Empresa (Mayoreo y Descuentos)</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>Correo Electrónico</label>
+        <input type="email" placeholder="usuario@correo.com" id="input-correo">
+      </div>
+      <div class="input-group">
+        <label>Contraseña</label>
+        <input type="password" placeholder="********" id="input-pass">
+      </div>
+
+      <div class="input-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
+        <input type="checkbox" id="recordar-sesion" style="width: auto; cursor: pointer;">
+        <label for="recordar-sesion" style="margin: 0; font-weight: normal; font-size: 13px; cursor: pointer; color: #444;">Recordar mi sesión</label>
+      </div>
+      
+      <button class="btn-ingresar" onclick="iniciarSesion()">Ingresar al Sistema</button>
     </div>
-</div>
+  </div>
 
-<div id="pantalla-principal" style="display: none; min-height: 100vh; background: #f4f7f6; display: flex; flex-direction: column; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <!-- Encabezado Superior -->
-    <nav style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #1e3c72; color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="../img/ControlPOOS.jpeg" alt="Logo ControlPOOS" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white;">
-            <h2 style="margin: 0; font-size: 1.4rem; letter-spacing: 0.5px;">CONTROLPOOS</h2>
-        </div>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="btn" onclick="abrirModal('modal-perfil')" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">👤 Mi Perfil</button>
-            <div onclick="abrirModal('modal-carrito')" style="cursor: pointer; position: relative; font-size: 1.3rem; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); padding: 8px 12px; border-radius: 8px;" title="Ver Carrito">🛒</div>
-        </div>
-    </nav>
-
-    <!-- Layout Principal: Sidebar Izquierdo + Contenido -->
-    <div style="display: flex; flex: 1; flex-direction: row; padding: 25px; gap: 25px; box-sizing: border-box;">
-        
-        <!-- Sidebar de Categorías (Izquierda) -->
-        <aside style="width: 260px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: fit-content;">
-            <h3 style="margin-top: 0; color: #1e3c72; font-size: 1.1rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px;">Categorías</h3>
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
-                <button onclick="filtrarCat('Todos')" style="text-align: left; padding: 12px 15px; background: #f0f4f8; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #1e3c72; transition: 0.2s;">✨ Todos los productos</button>
-                <button onclick="filtrarCat('Frutas')" style="text-align: left; padding: 12px 15px; background: transparent; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: #555; transition: 0.2s;">🍎 Frutas</button>
-                <button onclick="filtrarCat('Verduras')" style="text-align: left; padding: 12px 15px; background: transparent; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: #555; transition: 0.2s;">🥦 Verduras</button>
-                <button onclick="filtrarCat('Abarrotes')" style="text-align: left; padding: 12px 15px; background: transparent; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: #555; transition: 0.2s;">🥫 Abarrotes</button>
-            </div>
-        </aside>
-
-        <!-- Área Central (Buscador + Grid de Productos) -->
-        <main style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
-            <!-- Barra de Búsqueda -->
-            <div style="background: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 1.2rem;">🔍</span>
-                <input type="text" id="buscador" placeholder="Buscar producto en el inventario por nombre..." onkeyup="buscarProductos(this.value)" style="width: 100%; border: none; outline: none; font-size: 1rem; color: #333; background: transparent;">
-            </div>
-
-            <!-- Contenedor Dinámico de Productos -->
-            <div id="contenedor-productos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;"></div>
-        </main>
+  <div id="app-dashboard">
+    <div class="sidebar" id="menu-lateral">
+      <button class="btn-cerrar" onclick="cerrarSesion()">✖ Cerrar Sesión</button>
+      
+      <div class="logo-container">
+        <img src="./img/ControlPOOS.jpeg" id="logo-sidebar" alt="Logo">
+        <h2 id="sidebar-nombre-empresa">CONTROLPOOS</h2>
+        <span id="sidebar-badge-perfil" class="badge-perfil">Cliente</span>
+      </div>
+      
+     <h3 style="font-size: 13px; color: #999; margin: 10px 0;">CATEGORÍAS</h3>
+      <button class="btn-categoria" onclick="filtrarCategoria('Todos'); toggleMenuMovil();">Todos los productos</button>
+      <button class="btn-categoria" onclick="filtrarCategoria('Abarrotes'); toggleMenuMovil();">Abarrotes</button>
+      <button class="btn-categoria" onclick="filtrarCategoria('Frutas y Verduras'); toggleMenuMovil();">Frutas y Verduras</button>
+      <button class="btn-categoria" onclick="filtrarCategoria('Bebidas'); toggleMenuMovil();">Bebidas</button>
+      <button class="btn-categoria" onclick="filtrarCategoria('Snacks'); toggleMenuMovil();">🍿 Snacks</button>
+      <button class="btn-categoria" onclick="filtrarCategoria('Dulcería'); toggleMenuMovil();">Dulcería</button>
+      <button class="btn-categoria" onclick="filtrarCategoria('Limpieza'); toggleMenuMovil();">Limpieza</button>
+      
+      <h3 style="font-size: 13px; color: #999; margin: 20px 0 10px 0;">SISTEMA</h3>
+      <button class="btn-categoria" onclick="abrirAcercaDe(); toggleMenuMovil();">ℹ️ Acerca de Nosotros</button>
     </div>
-</div>
 
-<!-- Modal Carrito Mejorado -->
-<div id="modal-carrito" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 1000;">
-    <div style="background: white; width: 100%; max-width: 480px; border-radius: 16px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); overflow: hidden; display: flex; flex-direction: column;">
+    <div class="main-content">
+      <div class="top-bar">
+        <button class="btn-menu-movil" onclick="toggleMenuMovil()">☰</button>
+        <input type="text" id="input-buscador" class="buscador" placeholder="🔍 Buscar producto..." onkeyup="buscarProducto()">
         
-        <!-- Cabecera del Carrito -->
-        <div style="background: #1e3c72; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="margin: 0; font-size: 1.25rem;">🛒 Resumen de Compra</h2>
-            <span onclick="cerrarModal('modal-carrito')" style="cursor: pointer; font-size: 1.5rem; font-weight: bold; line-height: 1;">&times;</span>
+        <div class="acciones-usuario">
+          <button class="btn-perfil" onclick="abrirPerfil()">👤 Mi Perfil</button>
+          <button class="btn-carrito" onclick="toggleCarrito()">
+            🛒 <span id="contador-carrito">0</span>
+          </button>
         </div>
-        
-        <!-- Lista de Items -->
-        <div id="lista-carrito-items" style="padding: 20px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
-            <p style="color: #777; text-align: center; margin: 30px 0;">Tu carrito está vacío</p>
-        </div>
-
-        <!-- Footer del Carrito con Totales y Botones -->
-        <div style="background: #f8fafc; padding: 20px; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 15px;">
-            <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; color: #1e3c72;">
-                <span>Total General:</span>
-                <span id="carrito-total">$0.00</span>
-            </div>
-            <div style="display: flex; gap: 12px;">
-                <button onclick="cerrarModal('modal-carrito')" style="flex: 1; padding: 12px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #475569; transition: background 0.2s;">Seguir Comprando</button>
-                <button onclick="finalizarCompra()" style="flex: 1; padding: 12px; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 10px rgba(34,197,94,0.3);">Confirmar Venta</button>
-            </div>
-        </div>
+      </div>
+      <div id="contenedor-productos" class="grid-productos"></div>
     </div>
-</div>
+  </div>
 
-    <nav style="padding: 15px; display: flex; gap: 10px; justify-content: center;">
-        <button class="btn" onclick="filtrarCat('Frutas')">🍎 Frutas</button>
-        <button class="btn" onclick="filtrarCat('Verduras')">🥦 Verduras</button>
-        <button class="btn" onclick="filtrarCat('Abarrotes')">🥫 Abarrotes</button>
-        <button class="btn" onclick="filtrarCat('Todos')">✨ Todos</button>
-    </nav>
-
-    <!-- Grid de Productos -->
-    <div id="contenedor-productos" class="grid"></div>
-</div>
-
-<script>
-
-    let listaOriginal = []; 
-
-    async function cargarProductosDesdeAPI() {
-        const res = await fetch('http://localhost:3000/api/productos');
-        listaOriginal = await res.json(); // Aquí le asignas el valor
-        renderizar(listaOriginal);
-    }
-
-    function filtrarCat(cat) {
-        // Ahora sí podrá leer el valor de listaOriginal
-        if (cat === 'Todos') return renderizar(listaOriginal);
-        const filtrados = listaOriginal.filter(p => p.categoria === cat);
-        renderizar(filtrados);
-    }
-
-// Función para buscar productos interactivamente
-function buscarProductos(texto) {
-    const query = texto.toLowerCase();
-    const filtrados = listaOriginal.filter(p => p.nombre.toLowerCase().includes(query));
-    renderizar(filtrados);
-}
-
-// Funciones globales de control de modales
-function abrirModal(id) {
-    const modal = document.getElementById(id);
-    if (modal) modal.style.display = 'flex';
-}
-
-function cerrarModal(id) {
-    const modal = document.getElementById(id);
-    if (modal) modal.style.display = 'none';
-}
-
-    function validarLogin() {
-    console.log("Intentando ingresar..."); 
-    const email = document.getElementById('user').value;
+  <div id="panel-carrito" class="carrito-panel">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+      <h2>🛒 Carrito</h2>
+      <button onclick="toggleCarrito()" style="background: none; border: none; font-size: 24px; color: red; cursor: pointer;">✖</button>
+    </div>
     
-    if (email && email.includes('@')) {
-        document.getElementById('pantalla-login').style.display = 'none';
-        document.getElementById('pantalla-principal').style.display = 'block';
-        console.log("Cambio de pantalla exitoso");
-    } else {
-        alert("Revisa tu correo");
-    }
-}
-
-function renderizar(lista) {
-    const contenedor = document.getElementById('contenedor-productos');
-    contenedor.innerHTML = lista.map(p => `
-        <div class="card" style="box-shadow: 0 4px 8px rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; background: white; text-align: center;">
-            <img src="../img/${obtenerRutaImagen(p.nombre)}" alt="${p.nombre}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin-bottom: 10px;">
-            <h3 style="margin: 5px 0;">${p.nombre}</h3>
-            <p style="color: #666; font-size: 0.9em;">Stock: ${p.stock}</p>
-            <p style="font-size: 1.2em; font-weight: bold; color: var(--primary);">$${p.precio.toFixed(2)}</p>
-            <button class="btn" style="width: 100%;" onclick="agregarAlCarrito('${p.nombre}', ${p.precio})">Agregar</button>
+    <div id="lista-carrito" style="flex: 1; overflow-y: auto;"></div>
+    
+    <div style="margin-top: 15px; border-top: 2px solid #eee; padding-top: 15px;">
+      <div id="seccion-empresa" style="display: none; background: #e8f5e9; padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px dashed #2e7d32;">
+        <label style="font-size: 12px; font-weight: bold; color: #2e7d32; display: block; margin-bottom: 4px;">🏢 Código de Descuento Empresarial (Prueba: MAYOREO20)</label>
+        <div style="display: flex; gap: 5px;">
+          <input type="text" id="input-codigo-descuento" placeholder="Ej. MAYOREO20" style="flex: 1; padding: 6px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none;">
+          <button onclick="aplicarCodigoDescuento()" style="background: #2e7d32; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;">Aplicar</button>
         </div>
-    `).join('');
-}
+        <p id="mensaje-descuento" style="font-size: 11px; color: #2e7d32; margin-top: 4px; display: none;"></p>
+      </div>
 
-function obtenerRutaImagen(nombre) {
-    const n = nombre.toLowerCase();
-    if (n.includes('manzana')) return 'manzanaRoja.jpg';
-    if (n.includes('plátano') || n.includes('platano')) return 'platano.jpg';
-    if (n.includes('uvas')) return 'uvasVerdes.jpg';
-    if (n.includes('zanahoria')) return 'zanahoria.jpg';
-    if (n.includes('lechuga')) return 'lechugaRomana.jpg';
-    if (n.includes('leche')) return 'Lecheentera.jpg';
-    return 'ControlPOOS.jpeg'; // Imagen por defecto si no coincide ninguna
-}
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 13px; font-weight: bold; color: #333;">Método de Pago:</label>
+        <select id="metodo-pago" style="width: 100%; padding: 8px; margin-top: 4px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; outline: none;">
+          <option value="Efectivo">💵 Efectivo</option>
+          <option value="Tarjeta">💳 Tarjeta (Crédito/Débito)</option>
+          <option value="Transferencia">📱 Transferencia</option>
+        </select>
+      </div>
 
-// Función auxiliar para iconos (puedes expandirla)
-function obtenerIcono(nombre) {
-    if (nombre.toLowerCase().includes('manzana')) return '🍎';
-    if (nombre.toLowerCase().includes('leche')) return '🥛';
-    if (nombre.toLowerCase().includes('arroz')) return '🍚';
-    return '📦'; // Ícono por defecto
-}
-    </script>
-            <!-- Ventanas emergentes (Modales) -->
-        <div id="modal-perfil" class="modal">
-        <div class="modal-contenido">
-        <span onclick="cerrarModal('modal-perfil')" class="cerrar">&times;</span>
-        <h2>Perfil de Usuario</h2>
-        <p><strong>Correo:</strong> <span id="perfil-email"></span></p>
+      <div style="font-size: 13px; color: #555; display: flex; justify-content: space-between; margin-bottom: 4px;">
+        <span>Subtotal:</span>
+        <span>$<span id="subtotal-carrito">0.00</span></span>
+      </div>
+      <div id="fila-descuento-ticket" style="font-size: 13px; color: #2e7d32; display: flex; justify-content: space-between; margin-bottom: 4px; display: none;">
+        <span>Descuento Empresa:</span>
+        <span>-$<span id="monto-descuento">0.00</span></span>
+      </div>
+      <h3 style="text-align: center; margin-bottom: 10px; font-size: 18px;">Total: $<span id="total-carrito">0.00</span></h3>
+      
+      <button onclick="cobrar()" style="background: #4caf50; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer;">Cobrar Venta</button>
     </div>
+  </div>
+
+  <div id="modal-perfil" class="modal-overlay">
+    <div class="modal-content">
+      <button class="btn-cerrar-modal" onclick="cerrarPerfil()">✖</button>
+      <h2>Mi Perfil</h2>
+      <p style="color: gray; font-size: 13px; margin-bottom: 20px;">Información de tu cuenta en ControlPOOS</p>
+      <img src="./img/ControlPOOS.jpeg" id="foto-perfil-modal" class="foto-perfil-preview">
+      <br>
+      <div class="etiqueta-correo" id="texto-correo-perfil">correo@ejemplo.com</div>
+      <br>
+      <label class="btn-subir-foto">
+        Actualizar Fotografía
+        <input type="file" accept="image/*" onchange="cambiarFotoPerfil(event)">
+      </label>
     </div>
+  </div>
 
-    <div id="modal-carrito" class="modal">
-    <div class="modal-contenido">
-        <span onclick="cerrarModal('modal-carrito')" class="cerrar">&times;</span>
-        <h2>🛒 Tu Carrito</h2>
-        <div id="lista-carrito"></div>
-        <p><strong>Total: <span id="total-carrito">$0.00</span></strong></p>
+  <div id="modal-acerca" class="modal-overlay">
+    <div class="modal-content">
+      <button class="btn-cerrar-modal" onclick="cerrarAcercaDe()">✖</button>
+      <h2 style="color: #000851;">ControlPOOS</h2>
+      <img src="./img/ControlPOOS.jpeg" style="width: 90px; height: 90px; border-radius: 15px; object-fit: cover; margin: 15px 0; border: 2px solid #eee;">
+      
+      <!-- Sección "Acerca de nosotros" Compacta -->
+      <div style="width: 100%; max-width: 450px; margin: 0 auto; padding: 12px; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);">
+        
+        <!-- Cabecera -->
+        <div style="text-align: center; margin-bottom: 12px;">
+          <h3 style="color: #2c3e50; margin: 0 0 4px 0; font-size: 18px; font-weight: 700;">ControlPOOS</h3>
+          <p style="color: #666; font-size: 12px; margin: 0; line-height: 1.3;">
+            Sistema de inventario y ventas inteligente.
+          </p>
+        </div>
+        <!-- Tarjetas de Misión y Visión Reducidas -->
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box;">
+          
+          <!-- Misión -->
+          <div style="background: #f8f9fa; padding: 10px 12px; border-radius: 6px; border-left: 4px solid #3498db; box-sizing: border-box; width: 100%;">
+            <h4 style="margin: 0 0 4px 0; color: #2980b9; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+              <span>🎯</span> Misión
+            </h4>
+            <p style="margin: 0; font-size: 12px; line-height: 1.4; color: #555;">
+              Brindar una herramienta eficiente y accesible de inventarios y ventas para optimizar la administración de pequeños negocios.
+            </p>
+          </div>
+
+          <!-- Visión -->
+          <div style="background: #f8f9fa; padding: 10px 12px; border-radius: 6px; border-left: 4px solid #2ecc71; box-sizing: border-box; width: 100%;">
+            <h4 style="margin: 0 0 4px 0; color: #27ae60; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+              <span>🔭</span> Visión
+            </h4>
+            <p style="margin: 0; font-size: 12px; line-height: 1.4; color: #555;">
+              Ser el sistema punto de venta preferido por su facilidad de uso y adaptabilidad, impulsando el crecimiento comercial.
+            </p>
+          </div>
+
+        </div>
+      </div>
+      
+<!-- Sección de Redes Sociales -->
+<footer class="footer-redes" style="text-align: center; padding: 20px; background-color: #f8f9fa; margin-top: 40px;">
+    <p style="margin-bottom: 10px; font-weight: bold; color: #333;">¡Síguenos y conoce más sobre ControlPOOS!</p>
+    
+    <div style="display: flex; justify-content: center; gap: 15px;">
+        <!-- Enlace de Instagram -->
+        <a href="https://instagram.com/barber_gsxcrew" target="_blank" style="text-decoration: none; color: #E1306C; font-weight: bold;">
+            Instagram
+        </a>
+        
+        <!-- Enlace de Facebook -->
+        <a href="https://www.facebook.com/share/1C4cf9E2rm/?mibextid=wwXIfr" target="_blank" style="text-decoration: none; color: #1877F2; font-weight: bold;">
+            Facebook
+        </a>
+        
+        <!-- Enlace de GitHub o Soporte -->
+        <a href="https://github.com/urielbriceno83-pixel" target="_blank" style="text-decoration: none; color: #333; font-weight: bold;">
+            GitHub
+        </a>
     </div>
+</footer>
 
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+  <script type="module">
+    // Variables globales
+    let usuarioActual = { correo: "", perfil: "Cliente", foto: "./img/ControlPOOS.jpeg" };
+    let carritoDeCompras = [];
+    let subtotal = 0; 
+    let descuentoAplicadoPorcentaje = 0;
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBuuLUuRVtgLEAIp2dtwnATaT9cTpPzHzg",
-    authDomain: "controlpoos.firebaseapp.com",
-    projectId: "controlpoos",
-    storageBucket: "controlpoos.firebasestorage.app",
-    messagingSenderId: "783119856831",
-    appId: "1:783119856831:web:a5f34e9a149f09705f020a",
-    measurementId: "G-KWLLV360BK"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBuuLUuRVtgLEAIp2dtwnATaT9cTpPzHzg",
+      authDomain: "controlpoos.firebaseapp.com",
+      projectId: "controlpoos",
+      storageBucket: "controlpoos.firebasestorage.app",
+      messagingSenderId: "783119856831",
+      appId: "1:783119856831:web:a5f34e9a149f09705f020a",
+      measurementId: "G-KWLLV360BK"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const db = getFirestore(app);
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Guardamos la base de datos en una variable global para usarla en el resto de tu JS
-    window.db = db;
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    console.log("¡Firebase conectado correctamente!");
+    window.addEventListener("DOMContentLoaded", () => {
+      try {
+        const sesionGuardada = localStorage.getItem("controlpoos_sesion");
+        if (sesionGuardada) {
+          const datosParseados = JSON.parse(sesionGuardada);
+          if (datosParseados && datosParseados.correo) {
+            usuarioActual = datosParseados;
+            if (usuarioActual.foto) {
+              document.getElementById("logo-sidebar").src = usuarioActual.foto;
+              document.getElementById("foto-perfil-modal").src = usuarioActual.foto;
+            }
+            aplicarSesionEnInterfaz();
+          } else {
+            forzarLogin();
+          }
+        } else {
+          forzarLogin();
+        }
+      } catch (error) {
+        localStorage.removeItem("controlpoos_sesion");
+        forzarLogin();
+      }
+      
+      renderizarProductos(inventario);
+    });
 
-</script>
+    function forzarLogin() {
+      document.getElementById("pantalla-login").style.display = "flex";
+      document.getElementById("app-dashboard").style.display = "none";
+    }
 
+    function aplicarSesionEnInterfaz() {
+      document.getElementById("texto-correo-perfil").innerText = usuarioActual.correo;
+      document.getElementById("sidebar-nombre-empresa").innerText = usuarioActual.perfil === "Empresa" ? "CONTROLPOOS (Empresa)" : "CONTROLPOOS";
+      
+      const badge = document.getElementById("sidebar-badge-perfil");
+      badge.innerText = usuarioActual.perfil === "Empresa" ? "🏢 Cuenta Empresa" : "👤 Cuenta Cliente";
+      badge.className = usuarioActual.perfil === "Empresa" ? "badge-perfil badge-empresa" : "badge-perfil badge-cliente";
+
+      if (usuarioActual.perfil === "Empresa") {
+        document.getElementById("seccion-empresa").style.display = "block";
+      } else {
+        document.getElementById("seccion-empresa").style.display = "none";
+      }
+
+      document.getElementById("pantalla-login").style.display = "none";
+      document.getElementById("app-dashboard").style.display = "flex";
+    }
+
+    function iniciarSesion() {
+      const inputCorreo = document.getElementById("input-correo").value.trim();
+      const selectPerfil = document.getElementById("select-perfil").value;
+      const recordarSesion = document.getElementById("recordar-sesion").checked;
+      
+      if (inputCorreo === "") { 
+        alert("Por favor, ingresa tu correo para entrar a ControlPOOS."); 
+        return; 
+      }
+      
+      usuarioActual.correo = inputCorreo;
+      usuarioActual.perfil = selectPerfil;
+
+      if (recordarSesion) {
+        localStorage.setItem("controlpoos_sesion", JSON.stringify(usuarioActual));
+      } else {
+        localStorage.removeItem("controlpoos_sesion");
+      }
+
+      aplicarSesionEnInterfaz();
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem("controlpoos_sesion");
+      
+      document.getElementById("pantalla-login").style.display = "flex";
+      document.getElementById("app-dashboard").style.display = "none";
+      document.getElementById("input-correo").value = "";
+      document.getElementById("input-pass").value = "";
+      document.getElementById("input-codigo-descuento").value = "";
+      document.getElementById("recordar-sesion").checked = false;
+      document.getElementById("mensaje-descuento").style.display = "none";
+      descuentoAplicadoPorcentaje = 0;
+      usuarioActual.foto = "./img/ControlPOOS.jpeg";
+      document.getElementById("logo-sidebar").src = usuarioActual.foto;
+      document.getElementById("foto-perfil-modal").src = usuarioActual.foto;
+    }
+
+    function abrirPerfil() { document.getElementById("modal-perfil").style.display = "flex"; }
+    function cerrarPerfil() { document.getElementById("modal-perfil").style.display = "none"; }
+    
+    function cambiarFotoPerfil(event) {
+      const archivo = event.target.files[0];
+      if (archivo) {
+        const lector = new FileReader();
+        lector.onload = function(e) {
+          usuarioActual.foto = e.target.result;
+          document.getElementById("foto-perfil-modal").src = usuarioActual.foto;
+          document.getElementById("logo-sidebar").src = usuarioActual.foto;
+          
+          if (localStorage.getItem("controlpoos_sesion")) {
+            localStorage.setItem("controlpoos_sesion", JSON.stringify(usuarioActual));
+          }
+        }
+        lector.readAsDataURL(archivo);
+      }
+    }
+
+    function abrirAcercaDe() { document.getElementById("modal-acerca").style.display = "flex"; }
+    function cerrarAcercaDe() { document.getElementById("modal-acerca").style.display = "none"; }
+    function toggleMenuMovil() { if (window.innerWidth <= 768) { document.getElementById("menu-lateral").classList.toggle("activo"); } }
+
+    const inventario = [
+      { 
+        id: 1, nombre: "Arroz Blanco", categoria: "Abarrotes", imagen: "./img/arrozblanco.jpg", stock: 30,
+        opciones: [
+          { presentacion: "1/2 Kilo (500g)", precio: 13.50 },
+          { presentacion: "1 Kilo", precio: 25.50 },
+          { presentacion: "2 Kilos", precio: 48.00 }
+        ]
+      },
+      { 
+        id: 2, nombre: "Coca-Cola", categoria: "Bebidas", imagen: "./img/cocacola.jpg", stock: 50,
+        opciones: [
+          { presentacion: "600 ml", precio: 22.00 },
+          { presentacion: "1 Litro", precio: 32.00 },
+          { presentacion: "2 Litros No Ret.", precio: 45.00 }
+        ]
+      },
+      { 
+        id: 3, nombre: "Jabón Zote", categoria: "Limpieza", imagen: "./img/jabonzote.jpg", stock: 25,
+        opciones: [
+          { presentacion: "Pieza Chica (200g)", precio: 12.00 },
+          { presentacion: "Pieza Normal (400g)", precio: 18.00 }
+        ]
+      },
+      { 
+        id: 4, nombre: "Leche Entera", categoria: "Abarrotes", imagen: "./img/Lecheentera.jpg", stock: 20,
+        opciones: [
+          { presentacion: "1 Litro (Tetrapack)", precio: 28.00 },
+          { presentacion: "Galón (3.78 L)", precio: 95.00 }
+        ]
+      },
+      { 
+        id: 5, nombre: "Lechuga Romana", categoria: "Frutas y Verduras", imagen: "./img/lechugaRomana.jpg", stock: 12,
+        opciones: [
+          { presentacion: "1 Pieza", precio: 15.00 },
+          { presentacion: "2 Piezas", precio: 28.00 }
+        ]
+      },
+      { 
+        id: 6, nombre: "Manzana Roja", categoria: "Frutas y Verduras", imagen: "./img/manzanaRoja.jpg", stock: 18,
+        opciones: [
+          { presentacion: "1/2 Kilo (500g)", precio: 21.00 },
+          { presentacion: "1 Kilo", precio: 40.00 },
+          { presentacion: "2 Kilos", precio: 75.00 }
+        ]
+      },
+      { 
+        id: 7, nombre: "Plátano", categoria: "Frutas y Verduras", imagen: "./img/platano.jpg", stock: 22,
+        opciones: [
+          { presentacion: "1/2 Kilo (500g)", precio: 13.00 },
+          { presentacion: "1 Kilo", precio: 24.00 }
+        ]
+      },
+      { 
+        id: 8, nombre: "Uvas Verdes", categoria: "Frutas y Verduras", imagen: "./img/uvasVerdes.jpg", stock: 10,
+        opciones: [
+          { presentacion: "1/2 Kilo (500g)", precio: 34.00 },
+          { presentacion: "1 Kilo", precio: 65.00 }
+        ]
+      },
+      { 
+        id: 9, nombre: "Zanahoria", categoria: "Frutas y Verduras", imagen: "./img/zanahoria.jpg", stock: 35,
+        opciones: [
+          { presentacion: "1/2 Kilo (500g)", precio: 9.00 },
+          { presentacion: "1 Kilo", precio: 16.00 }
+        ]
+      },
+      { 
+        id: 10, nombre: "Chocolates Ferrero", categoria: "Dulcería", imagen: "./img/ferrero.jpg", stock: 15,
+        opciones: [
+          { presentacion: "Caja 8 pzas", precio: 35.00 },
+          { presentacion: "Caja 16 pzas", precio: 68.00 }
+        ]
+      },
+      { 
+        id: 11, nombre: "Granos de Elote", categoria: "Abarrotes", imagen: "./img/GranosDeelote.jpg", stock: 25,
+        opciones: [
+          { presentacion: "Lata 220g", precio: 14.50 },
+          { presentacion: "Lata 400g", precio: 19.50 }
+        ]
+      },
+      { 
+        id: 12, nombre: "Papas Adobadas Flamin", categoria: "Snacks", imagen: "./img/adobadasflamin.jpg", stock: 25,
+        opciones: [
+          { presentacion: "Chico (50g)", precio: 14.00 },
+          { presentacion: "Mediano (110g)", precio: 22.00 },
+          { presentacion: "Mega (240g)", precio: 42.00 }
+        ]
+      },
+      { 
+        id: 13, nombre: "Agua Bonafont", categoria: "Bebidas", imagen: "./img/aguabonafont.jpg", stock: 40,
+        opciones: [
+          { presentacion: "600 ml", precio: 12.00 },
+          { presentacion: "1 Litro", precio: 18.00 },
+          { presentacion: "1.5 Litros", precio: 24.00 }
+        ]
+      },
+      { 
+        id: 14, nombre: "Pepsi", categoria: "Bebidas", imagen: "./img/pepsi.jpg", stock: 35,
+        opciones: [
+          { presentacion: "600 ml", precio: 18.00 },
+          { presentacion: "2 Litros", precio: 38.00 }
+        ]
+      },
+      { 
+        id: 15, nombre: "Galletas Oreo", categoria: "Snacks", imagen: "./img/oreo.jpg", stock: 30,
+        opciones: [
+          { presentacion: "Paquete Individual (114g)", precio: 18.00 },
+          { presentacion: "Rollo Familiar (264g)", precio: 35.00 }
+        ]
+      },
+      { 
+        id: 16, nombre: "Galletas Marías", categoria: "Snacks", imagen: "./img/marias.jpg", stock: 25,
+        opciones: [
+          { presentacion: "Paquete Regular (170g)", precio: 16.00 },
+          { presentacion: "Paquete Tubular (510g)", precio: 38.00 }
+        ]
+      },
+      { 
+        id: 17, nombre: "Doritos", categoria: "Snacks", imagen: "./img/doritos.jpg", stock: 30,
+        opciones: [
+          { presentacion: "Bolsa Chica (58g)", precio: 15.00 },
+          { presentacion: "Bolsa Mediana (150g)", precio: 32.00 }
+        ]
+      },
+      { 
+        id: 18, nombre: "Jumex", categoria: "Bebidas", imagen: "./img/jumex.jpg", stock: 25,
+        opciones: [
+          { presentacion: "Lata 335 ml", precio: 16.00 },
+          { presentacion: "Tetrapack 1 Litro", precio: 28.00 }
+        ]
+      },
+      { 
+        id: 19, nombre: "Huevo", categoria: "Abarrotes", imagen: "./img/huevo.jpg", stock: 15,
+        opciones: [
+          { presentacion: "1 Kilo (aprox. 16 pzas)", precio: 45.00 },
+          { presentacion: "Media Caja (15 Kilos)", precio: 620.00 }
+        ]
+      },
+      { 
+        id: 20, nombre: "Huevito Kinder", categoria: "Dulcería", imagen: "./img/huevitokinder.jpg", stock: 20,
+        opciones: [
+          { presentacion: "Pieza Individual (20g)", precio: 25.00 },
+          { presentacion: "Pack de 3 piezas", precio: 70.00 }
+        ]
+      },
+      { 
+        id: 21, nombre: "Boing", categoria: "Bebidas", imagen: "./img/boing.jpg", stock: 30,
+        opciones: [
+          { presentacion: "Vidrio 355 ml", precio: 15.00 },
+          { presentacion: "Tetrapack 500 ml", precio: 20.00 },
+          { presentacion: "Lata 500 ml", precio: 22.00 }
+        ]
+      }
+    ];
+
+    function renderizarProductos(productos) {
+      const contenedor = document.getElementById("contenedor-productos");
+      if (!contenedor) return;
+      contenedor.innerHTML = ""; 
+      if (productos.length === 0) { 
+        contenedor.innerHTML = `<h3 style="text-align: center; width: 100%; color: white;">Sin resultados</h3>`; 
+        return; 
+      }
+      
+      productos.forEach(item => {
+        let opcionesHTML = `<select id="opcion-${item.id}" style="width: 100%; padding: 6px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 13px; outline: none; background: #fafafa;" onchange="actualizarPrecioCard(${item.id})">`;
+        item.opciones.forEach((op, index) => {
+          opcionesHTML += `<option value="${index}">${op.presentacion}</option>`;
+        });
+        opcionesHTML += `</select>`;
+
+        const precioInicial = item.opciones[0].precio;
+
+        contenedor.innerHTML += `
+          <div class="card">
+            <img src="${item.imagen}" onerror="this.src='https://via.placeholder.com/150'">
+            <h4>${item.nombre}</h4>
+            ${opcionesHTML}
+            <p class="precio" id="precio-card-${item.id}">$${precioInicial.toFixed(2)}</p>
+            <p class="stock">Stock: ${item.stock}</p>
+            <button class="btn-agregar" onclick="agregarAlCarrito(${item.id})">Agregar</button>
+          </div>
+        `;
+      });
+    }
+
+    function actualizarPrecioCard(idProducto) {
+      const producto = inventario.find(p => p.id === idProducto);
+      const select = document.getElementById(`opcion-${idProducto}`);
+      const indiceOpcion = select.value;
+      const precioSeleccionado = producto.opciones[indiceOpcion].precio;
+      
+      document.getElementById(`precio-card-${idProducto}`).innerText = `$${precioSeleccionado.toFixed(2)}`;
+    }
+
+    function filtrarCategoria(categoria) {
+      if (categoria === 'Todos') {
+        renderizarProductos(inventario);
+      } else {
+        const filtrados = inventario.filter(p => p.categoria === categoria);
+        renderizarProductos(filtrados);
+      }
+    }
+
+    function buscarProducto() {
+      const texto = document.getElementById("input-buscador").value.toLowerCase();
+      const filtrados = inventario.filter(p => p.nombre.toLowerCase().includes(texto) || p.categoria.toLowerCase().includes(texto));
+      renderizarProductos(filtrados);
+    }
+
+    function toggleCarrito() {
+      document.getElementById("panel-carrito").classList.toggle("activo");
+    }
+
+    function agregarAlCarrito(idProducto) {
+      const producto = inventario.find(p => p.id === idProducto);
+      if (!producto) return;
+
+      const select = document.getElementById(`opcion-${idProducto}`);
+      const indiceOpcion = select ? parseInt(select.value) || 0 : 0;
+      const opcionElegida = producto.opciones[indiceOpcion] || producto.opciones[0];
+      
+      const precioFinal = Number(opcionElegida.precio) || 0;
+      const presentacionFinal = opcionElegida.presentacion || "Estándar";
+
+      const idUnicoItem = `${producto.id}-${presentacionFinal}`;
+      const itemExistente = carritoDeCompras.find(p => p.idUnico === idUnicoItem);
+
+      if (itemExistente) {
+        itemExistente.cantidad += 1;
+      } else {
+        carritoDeCompras.push({
+          idUnico: idUnicoItem,
+          id: producto.id,
+          nombre: producto.nombre,
+          presentacion: presentacionFinal,
+          precio: precioFinal,
+          cantidad: 1
+        });
+      }
+
+      actualizarInterfazCarrito();
+      toggleCarrito();
+    }
+
+    function eliminarDelCarrito(index) {
+      carritoDeCompras.splice(index, 1);
+      actualizarInterfazCarrito();
+    }
+
+    function actualizarInterfazCarrito() {
+      const listaHTML = document.getElementById("lista-carrito");
+      if (!listaHTML) return;
+
+      subtotal = 0; 
+      let cant = 0;
+      listaHTML.innerHTML = ""; 
+      
+      if (!carritoDeCompras || carritoDeCompras.length === 0) {
+        listaHTML.innerHTML = `<p style="text-align: center; color: gray; margin-top: 20px;">Vacío</p>`;
+      } else {
+        carritoDeCompras.forEach((item, index) => {
+          const precioSeguro = Number(item.precio) || 0;
+          const cantidadSegura = Number(item.cantidad) || 1;
+          const sub = precioSeguro * cantidadSegura;
+          
+          subtotal += sub; 
+          cant += cantidadSegura;
+          
+          listaHTML.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee;">
+              <div>
+                <p><strong>${item.nombre}</strong></p>
+                <p style="font-size:11px; color:#666;">(${item.presentacion})</p>
+                <p style="font-size:12px; color:gray;">${cantidadSegura} x $${precioSeguro.toFixed(2)}</p>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <strong style="color:green;">$${sub.toFixed(2)}</strong>
+                <button onclick="eliminarDelCarrito(${index})" style="background:red; color:white; border:none; padding:2px 6px; cursor:pointer; border-radius:4px;">X</button>
+              </div>
+            </div>`;
+        });
+      }
+
+      const descuentoPorc = (typeof descuentoAplicadoPorcentaje !== 'undefined') ? descuentoAplicadoPorcentaje : 0;
+      const montoDescuento = subtotal * descuentoPorc;
+      const totalFinal = subtotal - montoDescuento;
+
+      const contadorElem = document.getElementById("contador-carrito");
+      if (contadorElem) contadorElem.innerText = cant;
+      
+      const subtotalElem = document.getElementById("subtotal-carrito");
+      if (subtotalElem) subtotalElem.innerText = subtotal.toFixed(2);
+      
+      const filaDescuento = document.getElementById("fila-descuento-ticket");
+      const montoDescuentoElem = document.getElementById("monto-descuento");
+      
+      if (typeof usuarioActual !== 'undefined' && usuarioActual.perfil === "Empresa" && descuentoPorc > 0) {
+        if (filaDescuento) filaDescuento.style.display = "flex";
+        if (montoDescuentoElem) montoDescuentoElem.innerText = montoDescuento.toFixed(2);
+      } else {
+        if (filaDescuento) filaDescuento.style.display = "none";
+      }
+
+      const totalElem = document.getElementById("total-carrito");
+      if (totalElem) totalElem.innerText = totalFinal.toFixed(2);
+    }
+
+    function aplicarCodigoDescuento() {
+      const codigoInput = document.getElementById("input-codigo-descuento").value.trim();
+      const mensaje = document.getElementById("mensaje-descuento");
+
+      if (codigoInput === "MAYOREO20") {
+        descuentoAplicadoPorcentaje = 0.20; // 20% de descuento
+        mensaje.innerText = "¡Código aplicado con éxito (20% de descuento)!";
+        mensaje.style.display = "block";
+      } else {
+        descuentoAplicadoPorcentaje = 0;
+        mensaje.innerText = "Código inválido.";
+        mensaje.style.display = "block";
+        mensaje.style.color = "red";
+      }
+      actualizarInterfazCarrito();
+    }
+
+    async function cobrar() {
+      if (carritoDeCompras.length === 0) {
+        alert("El carrito está vacío.");
+        return;
+      }
+
+      const metodoPago = document.getElementById("metodo-pago").value;
+      const descuentoPorc = (typeof descuentoAplicadoPorcentaje !== 'undefined') ? descuentoAplicadoPorcentaje : 0;
+      const montoDescuento = subtotal * descuentoPorc;
+      const totalFinal = subtotal - montoDescuento;
+
+      const ventaData = {
+        correoUsuario: usuarioActual.correo,
+        perfil: usuarioActual.perfil,
+        productos: carritoDeCompras,
+        subtotal: subtotal,
+        descuento: montoDescuento,
+        total: totalFinal,
+        metodoPago: metodoPago,
+        fecha: new Date().toISOString()
+      };
+
+      try {
+        await addDoc(collection(db, "ventas"), ventaData);
+        alert("¡Venta cobrada y registrada en Firebase con éxito!");
+        carritoDeCompras = [];
+        descuentoAplicadoPorcentaje = 0;
+        document.getElementById("input-codigo-descuento").value = "";
+        document.getElementById("mensaje-descuento").style.display = "none";
+        actualizarInterfazCarrito();
+        toggleCarrito();
+      } catch (e) {
+        console.error("Error al registrar la venta: ", e);
+        alert("Hubo un error al registrar la venta en Firebase.");
+      }
+    }
+
+    // Exponer todas las funciones para que funcionen con los eventos onclick del HTML dentro del módulo
+    window.iniciarSesion = iniciarSesion;
+    window.cerrarSesion = cerrarSesion;
+    window.abrirPerfil = abrirPerfil;
+    window.cerrarPerfil = cerrarPerfil;
+    window.cambiarFotoPerfil = cambiarFotoPerfil;
+    window.abrirAcercaDe = abrirAcercaDe;
+    window.cerrarAcercaDe = cerrarAcercaDe;
+    window.toggleMenuMovil = toggleMenuMovil;
+    window.filtrarCategoria = filtrarCategoria;
+    window.buscarProducto = buscarProducto;
+    window.toggleCarrito = toggleCarrito;
+    window.agregarAlCarrito = agregarAlCarrito;
+    window.eliminarDelCarrito = eliminarDelCarrito;
+    window.actualizarPrecioCard = actualizarPrecioCard;
+    window.aplicarCodigoDescuento = aplicarCodigoDescuento;
+    window.cobrar = cobrar;
+  </script>
 </body>
 </html>
